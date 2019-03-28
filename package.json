@@ -1,0 +1,16 @@
+{
+  "name": "nextpass",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "gtfs-realtime-bindings": "^0.0.4",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marc-Olivier Mercier",
+  "license": "ISC"
+}

@@ -4,6 +4,7 @@
     "description": "",
     "main": "index.js",
     "dependencies": {
+        "firebase-admin": "^7.2.0",
         "gtfs-realtime-bindings": "^0.0.4",
         "request": "^2.88.0"
     },

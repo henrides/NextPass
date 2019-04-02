@@ -57,42 +57,42 @@ function getAllPassages() {
     return p;
 }
 
-getAllPassages().then((allPass) => {
-    //let collection = db.collection('tripUpdates');
-
-    let allPassKeys = Object.keys(allPass);
-    let totalCount = 0;
-    allPassKeys.forEach((routeKey) => {
-        let route = allPass[routeKey];
-        Object.keys(route).forEach((stopKey) => {
-            totalCount += 1;
+function writeTrip(route, stop, passages) {
+    let p = new Promise((resolve, reject) => {
+        db.ref('tripUpdates/'+route+'/'+stop).set({
+            stopId: stop,
+            routeId: route,
+            nextPassages: passages
+        }, (error) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
         });
     });
+    return p;
+}
 
-    let currentCount = 0;
-    allPassKeys.forEach((routeKey) => {
-        let route = allPass[routeKey];
+async function updateTrips() {
+    try {
+        let allPass = await getAllPassages();
+        let promises = [];
 
-        let routeKeys = Object.keys(route);
-        routeKeys.forEach((stopKey) => {
-            currentCount += 1;
-            /*
-            let stopDocRef = db.collection('tripUpdates').doc(routeKey + '|' + stopKey);
-            let data = {
-                stopId: stopKey,
-                routeId: stopKey,
-                nextPassages: route[stopKey].map((x) => x.toString())
-            };
-            let setStop = stopDocRef.set(data);
-            */
-            console.log(routeKey + '/' + stopKey + ' ' + currentCount + '/' + totalCount);
-            db.ref('tripUpdates/'+routeKey+'/'+stopKey).set({
-                stopId: stopKey,
-                routeId: stopKey,
-                nextPassages: route[stopKey].map((x) => x.toString())
+        let routeKeys = Object.keys(allPass);
+        routeKeys.forEach((routeKey) => {
+            let stopKeys = Object.keys(allPass[routeKey]);
+            stopKeys.forEach((stopKey) => {
+                promises.push(writeTrip(routeKey, stopKey, allPass[routeKey][stopKey].map((x) => x.toString())));
             });
         });
-    });
-    console.log('Done');
+
+        await Promise.all(promises);
+        console.log('Done');
+    } catch (error) {
+        console.log(JSON.stringify(error));
+    }
     process.exit();
-});
+}
+
+updateTrips();

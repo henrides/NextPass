@@ -10,7 +10,6 @@ admin.initializeApp({
   databaseURL: "https://nextpassage-df18d.firebaseio.com"
 });
 
-//let db = admin.firestore();
 let db = admin.database();
 
 const requestSettings = {
@@ -57,13 +56,9 @@ function getAllPassages() {
     return p;
 }
 
-function writeTrip(route, stop, passages) {
+function writeAllTrips(allPass) {
     let p = new Promise((resolve, reject) => {
-        db.ref('tripUpdates/'+route+'/'+stop).set({
-            stopId: stop,
-            routeId: route,
-            nextPassages: passages
-        }, (error) => {
+        db.ref('tripUpdates').set(allPass, (error) => {
             if (error) {
                 reject(error);
             } else {
@@ -77,18 +72,9 @@ function writeTrip(route, stop, passages) {
 async function updateTrips() {
     try {
         let allPass = await getAllPassages();
-        let promises = [];
 
-        let routeKeys = Object.keys(allPass);
-        routeKeys.forEach((routeKey) => {
-            let stopKeys = Object.keys(allPass[routeKey]);
-            stopKeys.forEach((stopKey) => {
-                promises.push(writeTrip(routeKey, stopKey, allPass[routeKey][stopKey].map((x) => x.toString())));
-            });
-        });
-
-        await Promise.all(promises);
-        console.log('Done');
+        await writeAllTrips(allPass);
+        console.log('Written');
     } catch (error) {
         console.log(JSON.stringify(error));
     }
@@ -96,3 +82,8 @@ async function updateTrips() {
 }
 
 updateTrips();
+/*
+setInterval(() => {
+    updateTrips();
+}, 60000);
+*/
